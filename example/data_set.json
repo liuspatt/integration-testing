@@ -1,0 +1,16 @@
+[
+	{
+		"login": {
+			"user": "email@gmail.com",
+			"pass": "some_test",
+			"country": "CO"
+		},
+		"order sell": {
+			"stock": "ECOPETROL",
+			"price": 2500
+		},
+		"cashout": {
+			"amount": 100
+		}
+	}
+]

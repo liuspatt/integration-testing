@@ -1,0 +1,54 @@
+[
+	{
+		"id": "login",
+		"request": {
+			"url": "{{url}}auth/login",
+			"method": "POST",
+			"headers": {},
+			"params": {},
+			"body": {
+				"email": "{{user}}",
+				"password": "{{pass}}",
+				"country": "{{country}}"
+			}
+		},
+		"response": {
+			"body": {
+				"sk2": "token"
+			},
+			"header": "",
+			"status": 201
+		},
+		"checks": {
+			"status": 201,
+			"body": {"sk2": ""}
+		}
+	},
+	{
+		"id": "order_buy",
+		"request": {
+			"url": "{{url}}order/init",
+			"method": "POST",
+			"headers": {},
+			"params": {},
+			"body": {
+				"email": "{{user}}",
+				"password": "{{pass}}",
+				"country": "{{country}}"
+			}
+		},
+		"response": {
+			"body": {
+				"sk2": "token"
+			},
+			"header": "",
+			"status": 201
+		},
+		"checks": {
+			"body": {
+				"sk2": "token"
+			},
+			"status": 200
+		}
+	}
+]

@@ -11,3 +11,5 @@
 /.eunit
 .elixir.plt
 erl_crash.dump
+lib/intst/intst
+lib/intst/example/*
