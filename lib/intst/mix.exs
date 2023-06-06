@@ -24,6 +24,7 @@ defmodule Intst.MixProject do
     [
       {:jason, "~> 1.2"},
       {:httpoison, "~> 1.8"},
+      {:yaml_elixir, "~> 2.9"}
     ]
   end
 end

@@ -2,22 +2,53 @@ defmodule Intst.Runner do
   require Intst.Utils
 
   def run(global_data, case_data, scenario) do
+    data_case_global = Map.get(case_data, "global")
+    data_case_global = prepare_data_with_generated_cases(data_case_global)
+    run_data = Map.merge(global_data, data_case_global)
+
     for map <- scenario do
       type = Map.get(map, "type")
       request = Map.get(map, "request")
-      data_case = Map.get(case_data, type)
+      data_case = Map.get(run_data, type)
 
-      if data_case == nil do
-        IO.puts("ERROR: #{type} not found in case data")
-        IO.puts("case_data: #{inspect(case_data)}")
-        System.halt(1)
-      end
+      data_values =
+        case data_case do
+          nil ->
+            run_data
 
-      data_case = prepare_data_with_generated_cases(data_case)
+          _ ->
+            prepared_data = prepare_data_with_generated_cases(data_case)
+            Map.merge(run_data, prepared_data)
+        end
+
+      IO.puts("data_case: #{inspect(data_case)}")
       method = Map.get(request, "method") |> String.downcase() |> String.to_atom()
-      data_values = Map.merge(global_data, data_case)
-      run_scenario(method, request, data_values)
+
+      response = run_scenario(method, request, data_values)
+
+      data =
+        case response do
+          {:ok, _, body, headers} ->
+            %{
+              "body" => body,
+              "headers" => headers
+            }
+
+          {:error, status, body, headers} ->
+            IO.puts("ERROR: #{inspect(status)}")
+            IO.puts("ERROR: #{inspect(body)}")
+            IO.puts("ERROR: #{inspect(headers)}")
+            System.halt(1)
+        end
+
+      IO.inspect(data)
+
+      # save response values in global_data
     end
+  end
+
+  def prepare_data_with_generated_cases(data_case) when data_case == nil do
+    %{}
   end
 
   def prepare_data_with_generated_cases(data_case) do
@@ -48,6 +79,7 @@ defmodule Intst.Runner do
 
   def run_scenario(method, scenario, data) when method == :get do
     IO.puts("scenario get: #{inspect(scenario)}")
+    IO.puts("scenario get: #{inspect(data)}")
   end
 
   def run_scenario(method, request, data_values) when method == :post do
@@ -58,34 +90,42 @@ defmodule Intst.Runner do
     body = Jason.encode!(body)
     headers = Map.get(request, "headers")
     headers = prepare_values(data_values, headers)
+    headers = [{"Content-Type", "application/json"}]
 
     # Realizar la solicitud POST
     IO.puts("url post: #{inspect(url)}")
     IO.puts("body post: #{inspect(body)}")
     IO.puts("headers post: #{inspect(headers)}")
 
-    response = HTTPoison.post!(url, body, [{"Content-Type", "application/json"},{"data", "some"}])
+    response = HTTPoison.post!(url, body, headers)
 
-    IO.puts("headers post: #{inspect(response)}")
     # Manejar la respuesta
     case response.status_code do
       200 ->
         handle_success(response)
+
       _ ->
         handle_error(response)
     end
   end
 
   def handle_success(response) do
-    IO.puts("Request successful!")
-    IO.puts("Response body: #{inspect(response.body)}")
-    IO.puts("Response headers: #{inspect(response.headers)}")
+    # todo: add timings and other metrics
+    {
+      :ok,
+      response.status_code,
+      response.body,
+      response.headers
+    }
   end
 
   def handle_error(response) do
-    IO.puts("Request failed!")
-    IO.puts("Status code: #{response.status_code}")
-    IO.puts("Response body: #{inspect(response.body)}")
-    IO.puts("Response headers: #{inspect(response.headers)}")
+    # todo: add cases for retry, etc
+    {
+      :ok,
+      response.status_code,
+      response.body,
+      response.headers
+    }
   end
 end

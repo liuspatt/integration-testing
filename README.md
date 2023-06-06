@@ -1,6 +1,4 @@
 # Integration testing
-
-
 ## Task
 
 - [X] Read data sets scenarios
@@ -10,7 +8,69 @@
 - [ ] Save fields responses scenarios
 - [ ] Metrics and safe fail 
 - [ ] Vus in sub process
+## Install
+- download bin file 
+- set path for bin file
+` run ./intst
 
+
+## run 
+
+### yaml config 
+```
+    escript intst --data=example/register_data.yml --scenario=example/register_scenario.yml --vus=1
+```
+### Json config
+```
+    escript intst --data=example/data_set.json --scenario=example/scenario.json --vus=1
+```
+
+## data file
+data_case.yalm
+```
+
+global_vars:
+  login_url: https://auth.com
+  orders_url: https://orders.com
+  cashin_url: https://cashin.com
+config:
+  iterations: 1
+cases:
+- global:
+    user: email_testint_{[a-z]random}@gmail.com
+    pass: "{[a-z]random}"
+    country: CO
+  register:
+    referral_code: li_ko
+  order_buy:
+    stock: ECOPETROL
+    price: 2500
+  cashout:
+    amount: 100
+
+```
+
+
+## scenario file 
+Scemario.yalm
+```
+# request resgister
+- type: register
+  request:
+    url: "{{url}}auth/register"
+    method: POST
+    headers: []
+    params: {}
+    body:
+      email: "{{user}}"
+      password: "{{pass}}"
+      country: "{{country}}"
+      referral_code: "{{country}}"
+  checks:
+    status: 201
+    body:
+      sk2: ''
+```
 
 
 ```

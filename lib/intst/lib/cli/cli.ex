@@ -19,10 +19,14 @@ defmodule Intst.CLI do
     # end
 
     {cases, global_vars} =
-      read_json_file(opts[:data])
+      read_yaml_file(opts[:data])
       |> (fn data -> {Map.get(data, "cases"), Map.get(data, "global_vars")} end).()
 
-    scenario_info = read_json_file(opts[:scenario])
+    scenario_info = read_yaml_file(opts[:scenario])
+
+    IO.puts("cases: #{inspect(cases)}")
+    IO.puts("global_vars: #{inspect(global_vars)}")
+    IO.puts("scenario_info: #{inspect(scenario_info)}")
 
     for map <- cases do
       Intst.Runner.run(global_vars, map, scenario_info)
@@ -48,6 +52,24 @@ defmodule Intst.CLI do
 
       {:error, reason} ->
         Logger.error("Failed to read JSON file: #{reason}")
+        nil
+    end
+  end
+
+  def read_yaml_file(file_name) do
+    case File.read(file_name) do
+      {:ok, content} ->
+        case YamlElixir.read_from_string(content) do
+          {:ok, data} ->
+            data
+
+          {:error, reason} ->
+            Logger.error("Failed to parse YAML file: #{reason}")
+            nil
+        end
+
+      {:error, reason} ->
+        Logger.error("Failed to read YAML file: #{reason}")
         nil
     end
   end
