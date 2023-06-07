@@ -24,10 +24,6 @@ defmodule Intst.CLI do
 
     scenario_info = read_yaml_file(opts[:scenario])
 
-    IO.puts("cases: #{inspect(cases)}")
-    IO.puts("global_vars: #{inspect(global_vars)}")
-    IO.puts("scenario_info: #{inspect(scenario_info)}")
-
     for map <- cases do
       Intst.Runner.run(global_vars, map, scenario_info)
     end

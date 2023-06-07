@@ -80,7 +80,7 @@ escript intst data_set.json scenario.json vus=1
 
 
 ```
-mix escript.build 
+mix escript.build
 escript intst --data=example/data_set.json --scenario=example/scenario.json --vus=1
 escript intst --d=data_set.json --s=scenario.json --v=1
 ```
@@ -88,10 +88,10 @@ escript intst --d=data_set.json --s=scenario.json --v=1
 ## Scenario examples
 
 ### Scenario create full user
-- [ ] register
-- [ ] login {sk2}
-- [ ] get_user_info {id}
-- [ ] bypass otps
+- [X] register
+- [X] login {sk2}
+- [X] get_user_info {id}
+- [X] bypass otps
 - [ ] set data full 
 - [ ] set images (*)
 - [ ] bypass compliance (*)
