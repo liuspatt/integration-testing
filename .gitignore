@@ -13,3 +13,5 @@
 erl_crash.dump
 lib/intst/intst
 lib/intst/example/*
+.DS_Store
+lib/intst/.DS_Store

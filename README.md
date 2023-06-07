@@ -19,6 +19,8 @@
 ### yaml config 
 ```
     escript intst --data=example/register_data.yml --scenario=example/register_scenario.yml --vus=1
+
+    intst --data=example/crcc_data.yml --scenario=example/crcc_scenario.yml --vus=1
 ```
 ### Json config
 ```

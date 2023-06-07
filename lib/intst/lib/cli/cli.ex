@@ -18,14 +18,21 @@ defmodule Intst.CLI do
     #   System.halt(1)
     # end
 
-    {cases, global_vars} =
+    {cases, global_vars, iterations} =
       read_yaml_file(opts[:data])
-      |> (fn data -> {Map.get(data, "cases"), Map.get(data, "global_vars")} end).()
+      |> (fn data ->
+            {
+              Map.get(data, "cases"),
+              Map.get(data, "global_vars"),
+              Map.get(IO.inspect(Map.get(data, "config")), "iterations")
+            }
+          end).()
 
+    IO.inspect(iterations, label: "iterations")
     scenario_info = read_yaml_file(opts[:scenario])
 
     for map <- cases do
-      Intst.Runner.run(global_vars, map, scenario_info)
+      Intst.Runner.run(global_vars, map, scenario_info, iterations)
     end
   end
 

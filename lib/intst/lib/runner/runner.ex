@@ -1,11 +1,15 @@
 defmodule Intst.Runner do
   require Intst.Utils
 
-  def run(global_data, case_data, scenario) do
+  def run(global_data, case_data, scenario, interations) do
     data_case_global = Map.get(case_data, "global")
     data_case_global = prepare_data_with_generated_cases(data_case_global)
     run_data = Map.merge(global_data, data_case_global)
-    run_scenario(scenario, run_data)
+
+    for i <- 1..interations do
+      IO.inspect(i, label: "i")
+      run_scenario(scenario, run_data)
+    end
   end
 
   def run_scenario(scenario, run_data) do
