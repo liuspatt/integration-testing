@@ -49,15 +49,14 @@ defmodule Intst.Runner do
 
       acc = Map.put(acc, type, body_response)
 
-      acc =
-        case data_to_save do
-          nil ->
-            acc
+      case data_to_save do
+        nil ->
+          acc
 
-          _ ->
-            result = prepare_values_to_saved(body_response, data_to_save)
-            update_data_map(acc, result)
-        end
+        _ ->
+          result = prepare_values_to_saved(body_response, data_to_save)
+          update_data_map(acc, result)
+      end
     end)
   end
 
@@ -79,9 +78,10 @@ defmodule Intst.Runner do
     end)
   end
 
-  def prepare_values(data_values, structure) when structure == nil do
+  def prepare_values(_, structure) when structure == nil do
     %{}
   end
+
   def prepare_values(data_values, structure) do
     Enum.reduce(structure, %{}, fn {key, value}, acc ->
       if Intst.Utils.is_fillable(value) do
@@ -101,7 +101,7 @@ defmodule Intst.Runner do
 
   def prepare_header_values(data_values, structure) do
     headers =
-      Enum.reduce(structure, [], fn {key, value}, acc ->
+      Enum.reduce(structure, [], fn {key, value}, _ ->
         if Intst.Utils.is_fillable(value) do
           value_key = Intst.Utils.remove_braces(value)
           new_value = Map.get(data_values, value_key)
@@ -126,12 +126,13 @@ defmodule Intst.Runner do
   def run_scenario(method, request, data_values) when method == :get do
     url = Map.get(request, "url")
     params = Map.get(request, "params")
-
     params = prepare_values(data_values, params)
 
     headers = Map.get(request, "headers")
     headers = prepare_header_values(data_values, headers)
-    response = HTTPoison.get!(url, headers)
+
+    options = [params: params, recv_timeout: 50000]
+    response = HTTPoison.get!(url, headers, options)
 
     case response.status_code do
       200 ->
