@@ -1,23 +1,22 @@
 defmodule Intst.Runner do
   require Intst.Utils
 
-  def run(global_data, case_data, scenario, interations) do
-    data_case_global = Map.get(case_data, "global")
-    data_case_global = prepare_data_with_generated_cases(data_case_global)
-    run_data = Map.merge(global_data, data_case_global)
-
+  def run(global_data, base_case_data, scenario, interations) do
     for i <- 1..interations do
+      data_case_global = Map.get(base_case_data, "global")
+      data_case_global = prepare_data_with_generated_cases(data_case_global)
+      run_data = Map.merge(global_data, data_case_global)
       IO.inspect(i, label: "i")
-      run_scenario(scenario, run_data)
+      run_scenario(scenario, run_data, base_case_data)
     end
   end
 
-  def run_scenario(scenario, run_data) do
+  def run_scenario(scenario, run_data, base_case_data) do
     Enum.reduce(scenario, %{"data" => %{}}, fn map, acc ->
       type = Map.get(map, "type")
       request = Map.get(map, "request")
       data_to_save = Map.get(map, "data_to_save")
-      data_case = Map.get(run_data, type)
+      data_case = Map.get(base_case_data, type)
 
       data_values =
         case data_case do
@@ -30,7 +29,7 @@ defmodule Intst.Runner do
 
       data_values = Map.merge(Map.get(acc, "data"), data_values)
       method = Map.get(request, "method") |> String.downcase() |> String.to_atom()
-      response = run_scenario(method, request, data_values)
+      response = run_request(method, request, data_values)
 
       data =
         case response do
@@ -65,6 +64,8 @@ defmodule Intst.Runner do
   end
 
   def update_data_map(data_map, data) do
+    IO.inspect(data_map, label: "data_map")
+    IO.inspect(data, label: "data")
     pre_data = Map.get(data_map, "data")
     data_merged = Map.merge(pre_data, data)
     Map.replace!(data_map, "data", data_merged)
@@ -127,7 +128,7 @@ defmodule Intst.Runner do
     end)
   end
 
-  def run_scenario(method, request, data_values) when method == :get do
+  def run_request(method, request, data_values) when method == :get do
     url = Map.get(request, "url")
     params = Map.get(request, "params")
     params = prepare_values(data_values, params)
@@ -147,7 +148,7 @@ defmodule Intst.Runner do
     end
   end
 
-  def run_scenario(method, request, data_values) when method == :post do
+  def run_request(method, request, data_values) when method == :post do
     url = Map.get(request, "url")
     body = Map.get(request, "body")
     body = prepare_values(data_values, body)
@@ -160,6 +161,7 @@ defmodule Intst.Runner do
     headers = prepare_header_values(data_values, headers)
 
     options = [params: params, recv_timeout: 50000]
+    IO.inspect(body, label: "body")
     response = HTTPoison.post!(url, body, headers, options)
 
     case response.status_code do
@@ -173,21 +175,27 @@ defmodule Intst.Runner do
 
   def handle_success(response) do
     # todo: add timings and other metrics
-    {
-      :ok,
-      response.status_code,
-      Jason.decode!(response.body),
-      response.headers
-    }
+    IO.inspect(
+      {
+        :ok,
+        response.status_code,
+        Jason.decode!(response.body),
+        response.headers
+      },
+      label: "OK: response"
+    )
   end
 
   def handle_error(response) do
     # todo: add cases for retry, etc
-    {
-      :ok,
-      response.status_code,
-      Jason.decode!(response.body),
-      response.headers
-    }
+    IO.inspect(
+      {
+        :ok,
+        response.status_code,
+        response.body,
+        response.headers
+      },
+      label: "ERROR: response"
+    )
   end
 end
