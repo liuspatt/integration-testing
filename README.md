@@ -4,8 +4,8 @@
 - [X] Read data sets scenarios
 - [X] Build random fields
 - [X] Send request in order scenarios
-- [ ] Json config to yaml
-- [ ] Save fields responses scenarios
+- [X] Json config to yaml
+- [X] Save fields responses scenarios
 - [ ] Metrics and safe fail 
 - [ ] Vus in sub process
 ## Install
@@ -22,10 +22,13 @@
 
     intst --data=example/crcc_data.yml --scenario=example/crcc_scenario.yml --vus=1
 ```
+
+
 ### Json config
 ```
     escript intst --data=example/data_set.json --scenario=example/scenario.json --vus=1
 ```
+
 
 ## data file
 data_case.yalm
@@ -74,12 +77,10 @@ Scemario.yalm
       sk2: ''
 ```
 
-
 ```
 intst data_set.json scenario.json -vus=1
 escript intst data_set.json scenario.json vus=1
 ```
-
 
 ```
 mix escript.build

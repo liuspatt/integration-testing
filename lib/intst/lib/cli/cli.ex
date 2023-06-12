@@ -32,7 +32,9 @@ defmodule Intst.CLI do
     scenario_info = read_yaml_file(opts[:scenario])
 
     for map <- cases do
-      Intst.Runner.run(global_vars, map, scenario_info, iterations)
+      # sub process
+      pid = spawn(Intst.Runner.run(global_vars, map, scenario_info, iterations))
+      IO.inspect(pid, label: "pid")
     end
   end
 
