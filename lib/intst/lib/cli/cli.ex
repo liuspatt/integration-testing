@@ -10,7 +10,7 @@ defmodule Intst.CLI do
 
     {opts, _, _} = OptionParser.parse(args, options)
 
-    required_options = [:data, :scenario]
+    # required_options = [:data, :scenario]
 
     # missing_options = Enum.filter(required_options, fn(option) -> Map.get(options, option) == nil end)
     # unless Enum.empty?(missing_options) do
@@ -24,17 +24,31 @@ defmodule Intst.CLI do
             {
               Map.get(data, "cases"),
               Map.get(data, "global_vars"),
-              Map.get(IO.inspect(Map.get(data, "config")), "iterations")
+              Map.get(Map.get(data, "config"), "iterations")
             }
           end).()
+
+    vus =
+      case opts[:vus] do
+        nil ->
+          1
+
+        _ ->
+          String.to_integer(opts[:vus])
+      end
 
     IO.inspect(iterations, label: "iterations")
     scenario_info = read_yaml_file(opts[:scenario])
 
     for map <- cases do
       # sub process
-      pid = spawn(Intst.Runner.run(global_vars, map, scenario_info, iterations))
-      IO.inspect(pid, label: "pid")
+      list_task =
+        Enum.map(0..vus, fn _ ->
+          Task.async(fn -> Intst.Runner.run(global_vars, map, scenario_info, iterations) end)
+        end)
+
+      IO.inspect(list_task)
+      Enum.map(list_task, fn task -> Task.await(task, 1500_000) end)
     end
   end
 

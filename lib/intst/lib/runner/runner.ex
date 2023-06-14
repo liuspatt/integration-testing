@@ -43,7 +43,7 @@ defmodule Intst.Runner do
             IO.puts("ERROR: #{inspect(status)}")
             IO.puts("ERROR: #{inspect(body)}")
             IO.puts("ERROR: #{inspect(headers)}")
-            System.halt(1)
+            # System.halt(1)
         end
 
       # get save data
@@ -64,8 +64,6 @@ defmodule Intst.Runner do
   end
 
   def update_data_map(data_map, data) do
-    IO.inspect(data_map, label: "data_map")
-    IO.inspect(data, label: "data")
     pre_data = Map.get(data_map, "data")
     data_merged = Map.merge(pre_data, data)
     Map.replace!(data_map, "data", data_merged)
@@ -161,7 +159,7 @@ defmodule Intst.Runner do
     headers = prepare_header_values(data_values, headers)
 
     options = [params: params, recv_timeout: 50000]
-    IO.inspect(body, label: "body")
+    # IO.inspect(body, label: "body")
     response = HTTPoison.post!(url, body, headers, options)
 
     case response.status_code do
@@ -175,27 +173,40 @@ defmodule Intst.Runner do
 
   def handle_success(response) do
     # todo: add timings and other metrics
-    IO.inspect(
-      {
-        :ok,
-        response.status_code,
-        Jason.decode!(response.body),
-        response.headers
-      },
-      label: "OK: response"
-    )
+    # IO.inspect(
+    #   {
+    #     :ok,
+    #     response.status_code,
+    #     Jason.decode!(response.body),
+    #     response.headers
+    #   },
+    #   label: "OK: response"
+    # )
+
+    {
+      :ok,
+      response.status_code,
+      Jason.decode!(response.body),
+      response.headers
+    }
   end
 
   def handle_error(response) do
     # todo: add cases for retry, etc
-    IO.inspect(
-      {
-        :ok,
-        response.status_code,
-        response.body,
-        response.headers
-      },
-      label: "ERROR: response"
-    )
+    # IO.inspect(
+    #   {
+    #     :ok,
+    #     response.status_code,
+    #     response.body,
+    #     response.headers
+    #   },
+    #   label: "ERROR: response"
+    # )
+    {
+      :ok,
+      response.status_code,
+      response.body,
+      response.headers
+    }
   end
 end
