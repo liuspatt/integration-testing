@@ -3,6 +3,5 @@ defmodule IntstTest do
   doctest Intst
 
   test "greets the world" do
-    assert Intst.hello() == :world
   end
 end

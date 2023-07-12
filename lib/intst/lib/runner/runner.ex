@@ -128,6 +128,7 @@ defmodule Intst.Runner do
 
   def run_request(method, request, data_values) when method == :get do
     url = Map.get(request, "url")
+
     params = Map.get(request, "params")
     params = prepare_values(data_values, params)
 

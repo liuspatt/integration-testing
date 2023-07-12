@@ -6,6 +6,7 @@
 - [X] Send request in order scenarios
 - [X] Json config to yaml
 - [X] Save fields responses scenarios
+- [X] Dynamic urls
 - [ ] Metrics and safe fail 
 - [ ] Vus in sub process
 ## Install
